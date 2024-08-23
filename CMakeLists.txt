@@ -24,7 +24,12 @@ if (NOT EXISTS ${LUA_DIR})
   set(LUA_SOURCES_RELATIVE "\n")
   foreach(LUA_SOURCE ${LUA_SOURCES})
     file(RELATIVE_PATH LUA_SOURCE_RELATIVE ${LUA_DIR} ${LUA_SOURCE})
-    set(LUA_SOURCES_RELATIVE "${LUA_SOURCES_RELATIVE}\t${LUA_SOURCE_RELATIVE}\n")
+    if (LUA_SOURCE_RELATIVE STREQUAL "src/lua.c" 
+    OR  LUA_SOURCE_RELATIVE STREQUAL "src/luac.c")
+      set(LUA_SOURCES_RELATIVE "${LUA_SOURCES_RELATIVE}\t# ${LUA_SOURCE_RELATIVE}\n")
+    else()
+      set(LUA_SOURCES_RELATIVE "${LUA_SOURCES_RELATIVE}\t${LUA_SOURCE_RELATIVE}\n")
+    endif()
   endforeach(LUA_SOURCE)
 
   file(WRITE ${LUA_DIR}/CMakeLists.txt
@@ -41,3 +46,14 @@ add_subdirectory(${LUA_DIR})
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_link_libraries(${PROJECT_NAME} INTERFACE lua)
+
+option(LUA_EXECUTABLES "Build lua and luac as executables" Off)
+if (LUA_EXECUTABLES)
+  # Build interpreter
+  add_executable(luai ${LUA_DIR}/src/lua.c)
+  target_link_libraries(luai PRIVATE lua)
+  set_target_properties(luai PROPERTIES OUTPUT_NAME "lua")
+  # Build compiler
+  add_executable(luac ${LUA_DIR}/src/luac.c)
+  target_link_libraries(luac PRIVATE lua)
+endif()
