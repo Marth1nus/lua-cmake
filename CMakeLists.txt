@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.29)
-set(LUA_VERSION "5.4.7" CACHE STRING "Version of Lua to download and build")
-project(lua-${LUA_VERSION} VERSION 1.0.0 LANGUAGES C)
+project(lua-cmake VERSION 1.0.0 LANGUAGES C)
 
+set(LUA_VERSION "5.4.7" CACHE STRING "Version of Lua to download and build")
 set(LUA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lua-${LUA_VERSION}")
 
 if (NOT EXISTS ${LUA_DIR})
@@ -44,8 +44,8 @@ endif()
 
 add_subdirectory(${LUA_DIR})
 
-add_library(${PROJECT_NAME} INTERFACE)
-target_link_libraries(${PROJECT_NAME} INTERFACE lua)
+add_library(lua-${LUA_VERSION} INTERFACE)
+target_link_libraries(lua-${LUA_VERSION} INTERFACE lua)
 
 option(LUA_EXECUTABLES "Build lua and luac as executables" Off)
 if (LUA_EXECUTABLES)
