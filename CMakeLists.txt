@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.29)
+set(LUA_VERSION "5.4.7" CACHE STRING "Version of Lua to download and build")
+project(lua-${LUA_VERSION} VERSION 1.0.0 LANGUAGES C)
+
+set(LUA_DIR "${CMAKE_BINARY_DIR}/lua-${LUA_VERSION}")
+
+if (NOT EXISTS ${LUA_DIR})
+  set(LUA_TAR "lua-${LUA_VERSION}.tar.gz")
+  set(LUA_URL "https://www.lua.org/ftp/${LUA_TAR}")
+
+  message(STATUS "Downloading ${LUA_URL}")
+  file(DOWNLOAD ${LUA_URL} ${LUA_TAR} SHOW_PROGRESS)
+
+  message(STATUS "Extracting ${LUA_TAR}")
+  execute_process(COMMAND tar zxf ${LUA_TAR})
+
+  message(STATUS "Removing ${LUA_TAR}")
+  file(REMOVE ${LUA_TAR})
+  
+  message(STATUS "Writing ${LUA_DIR}/CMakeLists.txt")
+  
+  # get sources relative to lua dir
+  file(GLOB LUA_SOURCES ${LUA_DIR}/src/*.c)
+  set(LUA_SOURCES_RELATIVE "\n")
+  foreach(LUA_SOURCE ${LUA_SOURCES})
+    file(RELATIVE_PATH LUA_SOURCE_RELATIVE ${LUA_DIR} ${LUA_SOURCE})
+    set(LUA_SOURCES_RELATIVE "${LUA_SOURCES_RELATIVE}\t${LUA_SOURCE_RELATIVE}\n")
+  endforeach(LUA_SOURCE)
+
+  file(WRITE ${LUA_DIR}/CMakeLists.txt
+"cmake_minimum_required(VERSION 3.29)
+project(lua VERSION ${LUA_VERSION} LANGUAGES C)
+
+add_library(\${PROJECT_NAME} ${LUA_SOURCES_RELATIVE})
+target_include_directories(\${PROJECT_NAME} PUBLIC src)")
+
+  message(STATUS "Available lua-${LUA_VERSION} (aka lua) in ${LUA_DIR}")
+endif()
+
+add_subdirectory(${LUA_DIR})
+
+add_library(${PROJECT_NAME} INTERFACE)
+target_link_libraries(${PROJECT_NAME} INTERFACE lua)
