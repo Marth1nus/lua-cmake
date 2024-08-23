@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.29)
 set(LUA_VERSION "5.4.7" CACHE STRING "Version of Lua to download and build")
 project(lua-${LUA_VERSION} VERSION 1.0.0 LANGUAGES C)
 
-set(LUA_DIR "lua-${LUA_VERSION}")
+set(LUA_DIR "${CMAKE_BINARY_DIR}/lua-${LUA_VERSION}")
 
 if (NOT EXISTS ${LUA_DIR})
-  set(LUA_TAR "lua-${LUA_VERSION}.tar.gz")
-  set(LUA_URL "https://www.lua.org/ftp/${LUA_TAR}")
+  set(LUA_TAR "${CMAKE_BINARY_DIR}/lua-${LUA_VERSION}.tar.gz")
+  set(LUA_URL "https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz")
 
   message(STATUS "Downloading ${LUA_URL}")
   file(DOWNLOAD ${LUA_URL} ${LUA_TAR} SHOW_PROGRESS)
 
   message(STATUS "Extracting ${LUA_TAR}")
-  execute_process(COMMAND tar zxf ${LUA_TAR})
+  execute_process(COMMAND tar zxf ${LUA_TAR} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
   message(STATUS "Removing ${LUA_TAR}")
   file(REMOVE ${LUA_TAR})
