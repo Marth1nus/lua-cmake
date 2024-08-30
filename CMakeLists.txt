@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.20)
 project(lua-cmake VERSION 1.0.0 LANGUAGES C)
 
 set(LUA_VERSION "5.4.7" CACHE STRING "Version of Lua to download and build")
